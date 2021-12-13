@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>How to Parse a JSON Request Body in Go – Alex Edwards</title>
+
+    <meta name="author" content="Alex Edwards">
+    
+<meta property="og:title" content="How to Parse a JSON Request Body in Go - Alex Edwards">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@ajmedwards">
+
+
+    <meta name="theme-color" content="#333333">
+    <link rel="icon" type="image/svg+xml" href="https://www.alexedwards.net/static/img/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./How to Parse a JSON Request Body in Go – Alex Edwards_files/css2" rel="stylesheet"> 
+    
+    <link rel="stylesheet" href="./How to Parse a JSON Request Body in Go – Alex Edwards_files/main.css">
+    
+    <link rel="alternate" href="https://www.alexedwards.net/static/feed.rss" type="application/rss+xml">
+</head>
+
+<body>
+    <header>
+        <div class="constrain">
+            <a href="https://www.alexedwards.net/" class="logo">Alex Edwards</a>
+            <nav class="no-mobile">
+                
+<a href="https://www.alexedwards.net/blog">Articles</a>
+<a href="https://www.alexedwards.net/work-with-me">Work with me</a>
+<a href="https://www.alexedwards.net/about">About</a>
+<a class="rss" href="https://www.alexedwards.net/static/feed.rss" title="RSS feed">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="14" height="14"> <path d="M0 0v4c9.93 0 18 8.07 18 18h4C22 9.85 12.15 0 0 0Zm0 7v4c6.07 0 11 4.93 11 11h4C15 13.72 8.28 7 0 7Zm3 9a3 3 0 0 0 0 6 3 3 0 0 0 0-6z"></path> </svg>
+</a>
+
+            </nav>
+            
+            <a href="https://www.alexedwards.net/menu" class="mobile menu-icon" title="Menu">
+<svg viewBox="0 0 100 80" width="20" height="20"> <rect width="100" height="20"></rect> <rect y="30" width="100" height="20"></rect> <rect y="60" width="100" height="20"></rect> </svg>
+</a>
+            
+        </div>
+    </header>
+    <main>
+        <div class="constrain">
+            
+<div class="single">
+    <div class="callout">
+        <div>
+            
+            <h3>Not sure how to structure your Go web application?</h3>
+            <p>My new book guides you through the start-to-finish build of a real world web application in Go<span class="detail"> — covering topics like how to structure your code, manage dependencies, create dynamic database-driven pages, and how to authenticate and authorize users securely</span>.</p>
+            
+            
+            <a class="button" href="https://lets-go.alexedwards.net/">Take a look!</a>
+        </div>
+        <a class="cover" href="https://lets-go.alexedwards.net/"><img loading="lazy" src="./How to Parse a JSON Request Body in Go – Alex Edwards_files/cover-sm.png"></a>
+    </div>
+    <article>
+        <h1>How to Parse a JSON Request Body in Go</h1>
+        <div class="preheader">
+                <strong>Published on:</strong> <time>October 21st, 2019</time>
+        </div>
+        <div class="copy">
+            
+<p>Let's say that you're building a JSON API with Go. And in some of the handlers — probably as part of a POST or PUT request — you want to read a JSON object from the request body and assign it to a struct in your code.</p>
+
+<p>After a bit of research, there's a good chance that you'll end up with some code that looks similar to the <code>personCreate</code> handler here:</p>
+
+<figure class="file">
+<figcaption>File: main.go</figcaption>
+<code class="go hljs"><pre><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">"encoding/json"</span>
+    <span class="hljs-string">"fmt"</span>
+    <span class="hljs-string">"log"</span>
+    <span class="hljs-string">"net/http"</span>
+)
+
+<span class="hljs-keyword">type</span> Person <span class="hljs-keyword">struct</span> {
+    Name <span class="hljs-keyword">string</span>
+    Age  <span class="hljs-keyword">int</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">personCreate</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+    <span class="hljs-comment">// Declare a new Person struct.</span>
+    <span class="hljs-keyword">var</span> p Person
+
+    <span class="hljs-comment">// Try to decode the request body into the struct. If there is an error,</span>
+    <span class="hljs-comment">// respond to the client with the error message and a 400 status code.</span>
+    err := json.NewDecoder(r.Body).Decode(&amp;p)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        <span class="hljs-keyword">return</span>
+    }
+
+    <span class="hljs-comment">// Do something with the Person struct...</span>
+    fmt.Fprintf(w, <span class="hljs-string">"Person: %+v"</span>, p)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+    mux := http.NewServeMux()
+    mux.HandleFunc(<span class="hljs-string">"/person/create"</span>, personCreate)
+
+    err := http.ListenAndServe(<span class="hljs-string">":4000"</span>, mux)
+    log.Fatal(err)
+}
+</pre></code></figure>
+
+<p>If you're putting together a quick prototype, or building an API for personal/internal use only, then the code in the <code>personCreate</code> handler is probably OK.</p>
+
+<p>But if you're building an API for public use in production then there are a few issues with this to be aware of, and things that can be improved.</p>
+
+<ol>
+<li><p>Not all errors returned by <a href="https://golang.org/pkg/encoding/json/#Decoder.Decode"><code>Decode()</code></a> are caused by a bad request from the client. Specifically, <code>Decode()</code> can return a <a href="https://golang.org/pkg/encoding/json/#InvalidUnmarshalError"><code>json.InvalidUnmarshalError</code></a> error — which is caused by an unmarshalable target destination being passed to <code>Decode()</code>. If that happens, then it indicates a problem with your application — not the client request — so really the error should be logged and a <code>500 Internal Server Error</code> response sent to the client instead.</p></li>
+
+<li><p>The error messages returned by <code>Decode()</code> aren't ideal for sending to a client. Some are arguably too detailed and expose information about the underlying program (like <code style="white-space: normal;">"json: cannot unmarshal number into Go struct field Person.Name of type string"</code>). Others aren't descriptive enough (like <code style="white-space: normal;">"unexpected EOF"</code>) and some are just plain confusing (like <code style="white-space: normal;">"invalid character 'A' looking for beginning of object key string"</code>). There also isn't consistency in the formatting or language used.</p></li>
+
+<li><p>A client can include extra unexpected fields in their JSON, and these fields will be silently ignored without the client receiving any error. We can fix this by using the decoder's <a href="https://golang.org/pkg/encoding/json/#Decoder.DisallowUnknownFields"><code>DisallowUnknownFields()</code></a> method.</p></li>
+
+<li><p>There's no upper limit on the size of the request body that will be read by the <code>Decode()</code> method. Limiting this would help prevent our server resources being wasted if a malcious client sends a very large request body, and it's something we can easily do by using the <a href="https://golang.org/pkg/net/http/#MaxBytesReader"><code>http.MaxBytesReader()</code></a> function.</p></li>
+
+<li><p>There's no check for a <code>Content-Type: application/json</code> header in the request. Of course, this header may not always be present, and mistakes and malicious clients mean that it isn't a guarantee of the <em>actual</em> content type. But checking for an incorrect <code>Content-Type</code> header would allow us to 'fail fast' and send a helpful error message without spending unnecessary resources on parsing the body.</p></li>
+
+<li><p>The decoder that we create with <code>json.NewDecoder()</code> is designed to decode streams of JSON objects and considers a request body like <code style="white-space: normal;">'{"Name": "Bob"}{"Name": "Carol": "Age": 54}'</code> or <code>'{"Name": "Dave"}{}'</code> to be valid. But in the code above only the first JSON object in the request body will actually be parsed. So if the client sends multiple JSON objects in the request body, we want to alert them to the fact that only a single object is supported.</p>
+<p>There are two ways to achieve this. We can either call the decoder's <code>Decode()</code> method for a second time and make sure that it returns an <code>io.EOF</code> error (if it does, then we know there are not any additional JSON objects or other data in the request body). Or we could avoid using <code>Decode()</code> altogether and read the body into a byte slice and pass it to <a href="https://golang.org/pkg/encoding/json/#Unmarshal"></a><code>json.Unmarshal()</code>, which <em>would</em> return an error if the body contains multiple JSON objects. The downside of using <code>json.Unmarshal()</code> is that there is no way to disallow extra unexpected fields in the JSON, so we can't address point 3 above.</p></li>
+</ol>
+
+<h2 id="an-improved-handler">An Improved Handler</h2>
+
+<p>Let's implement an alternative version of the <code>personCreate</code> handler which addresses all of these issues.</p>
+
+<p>You'll notice here that we're using the new <a href="https://golang.org/pkg/errors/#Is"><code>errors.Is()</code></a> and <a href="https://golang.org/pkg/errors/#As"><code>errors.As()</code></a> functions, which have been introduced in Go 1.13, to help intercept the errors from <code>Decode()</code>.</p>
+
+<figure class="file">
+    <figcaption>File: main.go</figcaption>
+    <code class="go hljs"><pre><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">"encoding/json"</span>
+    <span class="hljs-string">"errors"</span>
+    <span class="hljs-string">"fmt"</span>
+    <span class="hljs-string">"io"</span>
+    <span class="hljs-string">"log"</span>
+    <span class="hljs-string">"net/http"</span>
+    <span class="hljs-string">"strings"</span>
+
+    <span class="hljs-string">"github.com/golang/gddo/httputil/header"</span>
+)
+
+<span class="hljs-keyword">type</span> Person <span class="hljs-keyword">struct</span> {
+    Name <span class="hljs-keyword">string</span>
+    Age  <span class="hljs-keyword">int</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">personCreate</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+    <span class="hljs-comment">// If the Content-Type header is present, check that it has the value</span>
+    <span class="hljs-comment">// application/json. Note that we are using the gddo/httputil/header</span>
+    <span class="hljs-comment">// package to parse and extract the value here, so the check works</span>
+    <span class="hljs-comment">// even if the client includes additional charset or boundary</span>
+    <span class="hljs-comment">// information in the header.</span>
+    <span class="hljs-keyword">if</span> r.Header.Get(<span class="hljs-string">"Content-Type"</span>) != <span class="hljs-string">""</span> {
+        value, _ := header.ParseValueAndParams(r.Header, <span class="hljs-string">"Content-Type"</span>)
+        <span class="hljs-keyword">if</span> value != <span class="hljs-string">"application/json"</span> {
+            msg := <span class="hljs-string">"Content-Type header is not application/json"</span>
+            http.Error(w, msg, http.StatusUnsupportedMediaType)
+            <span class="hljs-keyword">return</span>
+        }
+    }
+
+    <span class="hljs-comment">// Use http.MaxBytesReader to enforce a maximum read of 1MB from the</span>
+    <span class="hljs-comment">// response body. A request body larger than that will now result in</span>
+    <span class="hljs-comment">// Decode() returning a "http: request body too large" error.</span>
+    r.Body = http.MaxBytesReader(w, r.Body, <span class="hljs-number">1048576</span>)
+
+    <span class="hljs-comment">// Setup the decoder and call the DisallowUnknownFields() method on it.</span>
+    <span class="hljs-comment">// This will cause Decode() to return a "json: unknown field ..." error</span>
+    <span class="hljs-comment">// if it encounters any extra unexpected fields in the JSON. Strictly</span>
+    <span class="hljs-comment">// speaking, it returns an error for "keys which do not match any</span>
+    <span class="hljs-comment">// non-ignored, exported fields in the destination".</span>
+    dec := json.NewDecoder(r.Body)
+    dec.DisallowUnknownFields()
+
+    <span class="hljs-keyword">var</span> p Person
+    err := dec.Decode(&amp;p)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">var</span> syntaxError *json.SyntaxError
+        <span class="hljs-keyword">var</span> unmarshalTypeError *json.UnmarshalTypeError
+
+        <span class="hljs-keyword">switch</span> {
+        <span class="hljs-comment">// Catch any syntax errors in the JSON and send an error message</span>
+        <span class="hljs-comment">// which interpolates the location of the problem to make it</span>
+        <span class="hljs-comment">// easier for the client to fix.</span>
+        <span class="hljs-keyword">case</span> errors.As(err, &amp;syntaxError):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains badly-formed JSON (at position %d)"</span>, syntaxError.Offset)
+            http.Error(w, msg, http.StatusBadRequest)
+
+        <span class="hljs-comment">// In some circumstances Decode() may also return an</span>
+        <span class="hljs-comment">// io.ErrUnexpectedEOF error for syntax errors in the JSON. There</span>
+        <span class="hljs-comment">// is an open issue regarding this at</span>
+        <span class="hljs-comment">// https://github.com/golang/go/issues/25956.</span>
+        <span class="hljs-keyword">case</span> errors.Is(err, io.ErrUnexpectedEOF):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains badly-formed JSON"</span>)
+            http.Error(w, msg, http.StatusBadRequest)
+
+        <span class="hljs-comment">// Catch any type errors, like trying to assign a string in the</span>
+        <span class="hljs-comment">// JSON request body to a int field in our Person struct. We can</span>
+        <span class="hljs-comment">// interpolate the relevant field name and position into the error</span>
+        <span class="hljs-comment">// message to make it easier for the client to fix.</span>
+        <span class="hljs-keyword">case</span> errors.As(err, &amp;unmarshalTypeError):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains an invalid value for the %q field (at position %d)"</span>, unmarshalTypeError.Field, unmarshalTypeError.Offset)
+            http.Error(w, msg, http.StatusBadRequest)
+
+        <span class="hljs-comment">// Catch the error caused by extra unexpected fields in the request</span>
+        <span class="hljs-comment">// body. We extract the field name from the error message and</span>
+        <span class="hljs-comment">// interpolate it in our custom error message. There is an open</span>
+        <span class="hljs-comment">// issue at https://github.com/golang/go/issues/29035 regarding</span>
+        <span class="hljs-comment">// turning this into a sentinel error.</span>
+        <span class="hljs-keyword">case</span> strings.HasPrefix(err.Error(), <span class="hljs-string">"json: unknown field "</span>):
+            fieldName := strings.TrimPrefix(err.Error(), <span class="hljs-string">"json: unknown field "</span>)
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains unknown field %s"</span>, fieldName)
+            http.Error(w, msg, http.StatusBadRequest)
+
+        <span class="hljs-comment">// An io.EOF error is returned by Decode() if the request body is</span>
+        <span class="hljs-comment">// empty.</span>
+        <span class="hljs-keyword">case</span> errors.Is(err, io.EOF):
+            msg := <span class="hljs-string">"Request body must not be empty"</span>
+            http.Error(w, msg, http.StatusBadRequest)
+
+        <span class="hljs-comment">// Catch the error caused by the request body being too large. Again</span>
+        <span class="hljs-comment">// there is an open issue regarding turning this into a sentinel</span>
+        <span class="hljs-comment">// error at https://github.com/golang/go/issues/30715.</span>
+        <span class="hljs-keyword">case</span> err.Error() == <span class="hljs-string">"http: request body too large"</span>:
+            msg := <span class="hljs-string">"Request body must not be larger than 1MB"</span>
+            http.Error(w, msg, http.StatusRequestEntityTooLarge)
+
+        <span class="hljs-comment">// Otherwise default to logging the error and sending a 500 Internal</span>
+        <span class="hljs-comment">// Server Error response.</span>
+        <span class="hljs-keyword">default</span>:
+            log.Println(err.Error())
+            http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+        }
+        <span class="hljs-keyword">return</span>
+    }
+
+    <span class="hljs-comment">// Call decode again, using a pointer to an empty anonymous struct as </span>
+    <span class="hljs-comment">// the destination. If the request body only contained a single JSON </span>
+    <span class="hljs-comment">// object this will return an io.EOF error. So if we get anything else, </span>
+    <span class="hljs-comment">// we know that there is additional data in the request body.</span>
+	err = dec.Decode(&amp;<span class="hljs-keyword">struct</span>{}{})
+	<span class="hljs-keyword">if</span> err != io.EOF {
+        msg := <span class="hljs-string">"Request body must only contain a single JSON object"</span>
+        http.Error(w, msg, http.StatusBadRequest)
+        <span class="hljs-keyword">return</span>
+    }
+
+    fmt.Fprintf(w, <span class="hljs-string">"Person: %+v"</span>, p)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+    mux := http.NewServeMux()
+    mux.HandleFunc(<span class="hljs-string">"/person/create"</span>, personCreate)
+
+    err := http.ListenAndServe(<span class="hljs-string">":4000"</span>, mux)
+    log.Fatal(err)
+}
+</pre></code></figure>
+
+<p>The clear downside here is that this code is a lot more verbose, and IMO, a little bit ugly. Things aren't helped by the fact that there are quite a few open issues with <code>json/encoding</code> which are on hold pending <a href="https://github.com/golang/go/issues/29035#issuecomment-444598621">a wider review</a> of the package.</p>
+
+<p>But from a security and client perspective it's a lot better 😊</p>
+
+<p>The handler is now stricter about the content it will accept; we're reducing the amount of server resources used unnecessarily; and the client gets clear and consistent error messages that provide a decent amount of information without over-sharing.</p>
+
+<p>As a side note, you might have noticed that the <code>json/encoding</code> package contains some other error types (like <a href="https://golang.org/pkg/encoding/json/#UnmarshalFieldError"><code>json.UnmarshalFieldError</code></a>) which aren't checked in the code above — but these have been deprecated and not used by the current version of Go.</p>
+
+<h2 id="makingahelperfunction">Making a Helper Function</h2>
+
+<p>If you've got a few handlers that need to to process JSON request bodies, you probably don't want to repeat this code in all of them.</p>
+
+<p>A solution which I've found works  well is to create a <code>decodeJSONBody()</code> helper function, and have this return a custom <code>malformedRequest</code> error type which wraps the errors and relevant status codes.</p>
+
+<p>For example:</p>
+
+<figure class="file">
+    <figcaption>File: helpers.go</figcaption>
+    <code class="go hljs"><pre><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">"encoding/json"</span>
+    <span class="hljs-string">"errors"</span>
+    <span class="hljs-string">"fmt"</span>
+    <span class="hljs-string">"io"</span>
+    <span class="hljs-string">"net/http"</span>
+    <span class="hljs-string">"strings"</span>
+
+    <span class="hljs-string">"github.com/golang/gddo/httputil/header"</span>
+)
+
+<span class="hljs-keyword">type</span> malformedRequest <span class="hljs-keyword">struct</span> {
+    status <span class="hljs-keyword">int</span>
+    msg    <span class="hljs-keyword">string</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(mr *malformedRequest)</span> <span class="hljs-title">Error</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> {
+    <span class="hljs-keyword">return</span> mr.msg
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">decodeJSONBody</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request, dst <span class="hljs-keyword">interface</span>{})</span> <span class="hljs-title">error</span></span> {
+    <span class="hljs-keyword">if</span> r.Header.Get(<span class="hljs-string">"Content-Type"</span>) != <span class="hljs-string">""</span> {
+        value, _ := header.ParseValueAndParams(r.Header, <span class="hljs-string">"Content-Type"</span>)
+        <span class="hljs-keyword">if</span> value != <span class="hljs-string">"application/json"</span> {
+            msg := <span class="hljs-string">"Content-Type header is not application/json"</span>
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusUnsupportedMediaType, msg: msg}
+        }
+    }
+
+    r.Body = http.MaxBytesReader(w, r.Body, <span class="hljs-number">1048576</span>)
+
+    dec := json.NewDecoder(r.Body)
+    dec.DisallowUnknownFields()
+
+    err := dec.Decode(&amp;dst)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">var</span> syntaxError *json.SyntaxError
+        <span class="hljs-keyword">var</span> unmarshalTypeError *json.UnmarshalTypeError
+
+        <span class="hljs-keyword">switch</span> {
+        <span class="hljs-keyword">case</span> errors.As(err, &amp;syntaxError):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains badly-formed JSON (at position %d)"</span>, syntaxError.Offset)
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+
+        <span class="hljs-keyword">case</span> errors.Is(err, io.ErrUnexpectedEOF):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains badly-formed JSON"</span>)
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+
+        <span class="hljs-keyword">case</span> errors.As(err, &amp;unmarshalTypeError):
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains an invalid value for the %q field (at position %d)"</span>, unmarshalTypeError.Field, unmarshalTypeError.Offset)
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+
+        <span class="hljs-keyword">case</span> strings.HasPrefix(err.Error(), <span class="hljs-string">"json: unknown field "</span>):
+            fieldName := strings.TrimPrefix(err.Error(), <span class="hljs-string">"json: unknown field "</span>)
+            msg := fmt.Sprintf(<span class="hljs-string">"Request body contains unknown field %s"</span>, fieldName)
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+
+        <span class="hljs-keyword">case</span> errors.Is(err, io.EOF):
+            msg := <span class="hljs-string">"Request body must not be empty"</span>
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+
+        <span class="hljs-keyword">case</span> err.Error() == <span class="hljs-string">"http: request body too large"</span>:
+            msg := <span class="hljs-string">"Request body must not be larger than 1MB"</span>
+            <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusRequestEntityTooLarge, msg: msg}
+
+        <span class="hljs-keyword">default</span>:
+            <span class="hljs-keyword">return</span> err
+        }
+    }
+
+	err = dec.Decode(&amp;<span class="hljs-keyword">struct</span>{}{})
+	<span class="hljs-keyword">if</span> err != io.EOF {
+        msg := <span class="hljs-string">"Request body must only contain a single JSON object"</span>
+        <span class="hljs-keyword">return</span> &amp;malformedRequest{status: http.StatusBadRequest, msg: msg}
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+}
+</pre></code></figure>
+
+<p>Once that's written, the code in your handlers can be kept really nice and compact:</p>
+
+<figure class="file">
+    <figcaption>File: main.go</figcaption>
+    <code class="go hljs"><pre><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+    <span class="hljs-string">"errors"</span>
+    <span class="hljs-string">"fmt"</span>
+    <span class="hljs-string">"log"</span>
+    <span class="hljs-string">"net/http"</span>
+)
+
+<span class="hljs-keyword">type</span> Person <span class="hljs-keyword">struct</span> {
+    Name <span class="hljs-keyword">string</span>
+    Age  <span class="hljs-keyword">int</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">personCreate</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+    <span class="hljs-keyword">var</span> p Person
+
+    err := decodeJSONBody(w, r, &amp;p)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">var</span> mr *malformedRequest
+        <span class="hljs-keyword">if</span> errors.As(err, &amp;mr) {
+            http.Error(w, mr.msg, mr.status)
+        } <span class="hljs-keyword">else</span> {
+            log.Println(err.Error())
+            http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+        }
+        <span class="hljs-keyword">return</span>
+    }
+
+    fmt.Fprintf(w, <span class="hljs-string">"Person: %+v"</span>, p)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+    mux := http.NewServeMux()
+    mux.HandleFunc(<span class="hljs-string">"/person/create"</span>, personCreate)
+
+    log.Println(<span class="hljs-string">"Starting server on :4000..."</span>)
+    err := http.ListenAndServe(<span class="hljs-string">":4000"</span>, mux)
+    log.Fatal(err)
+}
+</pre></code></figure>
+
+        </div>
+        <div class="info metadata">
+            
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+
+            <div class="copy">
+                <p>If you enjoyed this article, you might like to check out my <a href="https://www.alexedwards.net/blog">recommended tutorials list</a> or check out my books <a href="https://lets-go.alexedwards.net/">Let's Go</a> and <a href="https://lets-go-further.alexedwards.net/">Let's Go Further</a>, which teach you everything you need to know about how to build professional production-ready web applications and APIs with Go.</p>
+                <p>Filed under:<a href="https://www.alexedwards.net/blog/category/golang"><span class="tag">golang</span></a> <a href="https://www.alexedwards.net/blog/category/tutorial"><span class="tag">tutorial</span></a></p>
+            </div>
+        </div>
+    </article>
+    <section class="sidebar no-mobile">
+
+       
+        
+        
+    </section>
+</div>
+
+        </div>
+    </main>
+    
+    <footer>
+        <div class="constrain">
+            <div class="licenses">© Copyright 2013-2021 Alex Edwards<br>Code snippets are <a href="https://opensource.org/licenses/MIT">MIT licensed</a>
+                <br><a href="https://www.alexedwards.net/disclaimer">Disclaimer</a>
+                </div>
+            <div><i>Enjoy the rest of your <span id="weekday">Thursday</span>!</i></div>
+        </div>
+    </footer>
+    
+
+    <script type="text/javascript" async="" src="./How to Parse a JSON Request Body in Go – Alex Edwards_files/ga.js.download"></script><script type="text/javascript">
+        function setDay() {
+            let date = new Date();
+
+            let weekday = date.toLocaleDateString("en", {
+                weekday: "long"
+            });
+
+            document.getElementById("weekday").innerHTML = weekday;
+        }
+
+        window.addEventListener('DOMContentLoaded', function (event) {
+            setDay();
+        });
+    </script>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-23830196-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+
+<script src="./How to Parse a JSON Request Body in Go – Alex Edwards_files/highlight.js.download"></script>
+<script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', function (event) {
+        highlightCode();
+    });
+
+    function highlightCode() {
+        var codeBlocks = document.querySelectorAll('figure code');
+
+        codeBlocks.forEach(function(element, index) {
+            hljs.highlightBlock(element)
+        });
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

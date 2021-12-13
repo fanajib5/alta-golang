@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)https://levelup.gitconnected.com/media/4abba02c93986c67bf7a7bcc40834eb9 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>server.go – Medium</title><meta name="description" content="You can&#39;t perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to refresh your session."><meta name="twitter:widgets:csp" content="on"><meta name="robots" content="noindex"><!--<base target="_blank">--><base href="." target="_blank"><style>body {text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: "ff-tisa-web-pro", Georgia, Cambria, "Times New Roman", Times, serif; font-weight: 400; color: #333332; font-size: 18px; line-height: 1.4; margin: 0; background-color: white; overflow: hidden;}iframe {max-width: 100%;}</style></head><body><style>.gist .gist-file { margin-bottom: 0 !important; }.gist { text-rendering: auto; }</style><script src="./a2089a777e36a8afb58ac18411025bf4.js.download" charset="utf-8"></script><link rel="stylesheet" href="./gist-embed-ff75a167df5efbfedb0e388793ca9fe7.css"><div id="gist97985448" class="gist">
+    <div class="gist-file" translate="no">
+      <div class="gist-data">
+        <div class="js-gist-file-update-container js-task-list-container file-box">
+  <div id="file-server-go" class="file my-2">
+    
+  <div itemprop="text" class="Box-body p-0 blob-wrapper data type-go  ">
+
+      
+<div class="js-check-bidi blob-code-content">
+  <template class="js-file-alert-template"></template>
+<template class="js-line-alert-template"></template>
+
+  <table class="highlight tab-size js-file-line-container js-code-nav-container js-tagsearch-file" data-tab-size="8" data-paste-markdown-skip="" data-tagsearch-lang="Go" data-tagsearch-path="server.go">
+        <tbody><tr>
+          <td id="file-server-go-L1" class="blob-num js-line-number js-code-nav-line-number" data-line-number="1"></td>
+          <td id="file-server-go-LC1" class="blob-code blob-code-inner js-file-line"><span class="pl-k">package</span> api</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L2" class="blob-num js-line-number js-code-nav-line-number" data-line-number="2"></td>
+          <td id="file-server-go-LC2" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L3" class="blob-num js-line-number js-code-nav-line-number" data-line-number="3"></td>
+          <td id="file-server-go-LC3" class="blob-code blob-code-inner js-file-line"><span class="pl-k">import</span> (</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L4" class="blob-num js-line-number js-code-nav-line-number" data-line-number="4"></td>
+          <td id="file-server-go-LC4" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"fmt"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L5" class="blob-num js-line-number js-code-nav-line-number" data-line-number="5"></td>
+          <td id="file-server-go-LC5" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"log"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L6" class="blob-num js-line-number js-code-nav-line-number" data-line-number="6"></td>
+          <td id="file-server-go-LC6" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"os"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L7" class="blob-num js-line-number js-code-nav-line-number" data-line-number="7"></td>
+          <td id="file-server-go-LC7" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L8" class="blob-num js-line-number js-code-nav-line-number" data-line-number="8"></td>
+          <td id="file-server-go-LC8" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"github.com/joho/godotenv"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L9" class="blob-num js-line-number js-code-nav-line-number" data-line-number="9"></td>
+          <td id="file-server-go-LC9" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"github.com/victorsteven/fullstack/api/controllers"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L10" class="blob-num js-line-number js-code-nav-line-number" data-line-number="10"></td>
+          <td id="file-server-go-LC10" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"github.com/victorsteven/fullstack/api/seed"</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L11" class="blob-num js-line-number js-code-nav-line-number" data-line-number="11"></td>
+          <td id="file-server-go-LC11" class="blob-code blob-code-inner js-file-line">)</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L12" class="blob-num js-line-number js-code-nav-line-number" data-line-number="12"></td>
+          <td id="file-server-go-LC12" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L13" class="blob-num js-line-number js-code-nav-line-number" data-line-number="13"></td>
+          <td id="file-server-go-LC13" class="blob-code blob-code-inner js-file-line"><span class="pl-k">var</span> <span class="pl-s1">server</span> <span class="pl-c1">=</span> controllers.<span class="pl-smi">Server</span>{}</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L14" class="blob-num js-line-number js-code-nav-line-number" data-line-number="14"></td>
+          <td id="file-server-go-LC14" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L15" class="blob-num js-line-number js-code-nav-line-number" data-line-number="15"></td>
+          <td id="file-server-go-LC15" class="blob-code blob-code-inner js-file-line"><span class="pl-k">func</span> <span class="pl-en">Run</span>() {</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L16" class="blob-num js-line-number js-code-nav-line-number" data-line-number="16"></td>
+          <td id="file-server-go-LC16" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L17" class="blob-num js-line-number js-code-nav-line-number" data-line-number="17"></td>
+          <td id="file-server-go-LC17" class="blob-code blob-code-inner js-file-line">	<span class="pl-k">var</span> <span class="pl-s1">err</span> <span class="pl-smi">error</span></td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L18" class="blob-num js-line-number js-code-nav-line-number" data-line-number="18"></td>
+          <td id="file-server-go-LC18" class="blob-code blob-code-inner js-file-line">	<span class="pl-s1">err</span> <span class="pl-c1">=</span> <span class="pl-s1">godotenv</span>.<span class="pl-en">Load</span>()</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L19" class="blob-num js-line-number js-code-nav-line-number" data-line-number="19"></td>
+          <td id="file-server-go-LC19" class="blob-code blob-code-inner js-file-line">	<span class="pl-k">if</span> <span class="pl-s1">err</span> <span class="pl-c1">!=</span> <span class="pl-c1">nil</span> {</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L20" class="blob-num js-line-number js-code-nav-line-number" data-line-number="20"></td>
+          <td id="file-server-go-LC20" class="blob-code blob-code-inner js-file-line">		<span class="pl-s1">log</span>.<span class="pl-en">Fatalf</span>(<span class="pl-s">"Error getting env, not comming through %v"</span>, <span class="pl-s1">err</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L21" class="blob-num js-line-number js-code-nav-line-number" data-line-number="21"></td>
+          <td id="file-server-go-LC21" class="blob-code blob-code-inner js-file-line">	} <span class="pl-k">else</span> {</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L22" class="blob-num js-line-number js-code-nav-line-number" data-line-number="22"></td>
+          <td id="file-server-go-LC22" class="blob-code blob-code-inner js-file-line">		<span class="pl-s1">fmt</span>.<span class="pl-en">Println</span>(<span class="pl-s">"We are getting the env values"</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L23" class="blob-num js-line-number js-code-nav-line-number" data-line-number="23"></td>
+          <td id="file-server-go-LC23" class="blob-code blob-code-inner js-file-line">	}</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L24" class="blob-num js-line-number js-code-nav-line-number" data-line-number="24"></td>
+          <td id="file-server-go-LC24" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L25" class="blob-num js-line-number js-code-nav-line-number" data-line-number="25"></td>
+          <td id="file-server-go-LC25" class="blob-code blob-code-inner js-file-line">	<span class="pl-s1">server</span>.<span class="pl-en">Initialize</span>(<span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_DRIVER"</span>), <span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_USER"</span>), <span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_PASSWORD"</span>), <span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_PORT"</span>), <span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_HOST"</span>), <span class="pl-s1">os</span>.<span class="pl-en">Getenv</span>(<span class="pl-s">"DB_NAME"</span>))</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L26" class="blob-num js-line-number js-code-nav-line-number" data-line-number="26"></td>
+          <td id="file-server-go-LC26" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L27" class="blob-num js-line-number js-code-nav-line-number" data-line-number="27"></td>
+          <td id="file-server-go-LC27" class="blob-code blob-code-inner js-file-line">	<span class="pl-s1">seed</span>.<span class="pl-en">Load</span>(<span class="pl-s1">server</span>.<span class="pl-c1">DB</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L28" class="blob-num js-line-number js-code-nav-line-number" data-line-number="28"></td>
+          <td id="file-server-go-LC28" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L29" class="blob-num js-line-number js-code-nav-line-number" data-line-number="29"></td>
+          <td id="file-server-go-LC29" class="blob-code blob-code-inner js-file-line">	<span class="pl-s1">server</span>.<span class="pl-en">Run</span>(<span class="pl-s">":8080"</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L30" class="blob-num js-line-number js-code-nav-line-number" data-line-number="30"></td>
+          <td id="file-server-go-LC30" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-server-go-L31" class="blob-num js-line-number js-code-nav-line-number" data-line-number="31"></td>
+          <td id="file-server-go-LC31" class="blob-code blob-code-inner js-file-line">}</td>
+        </tr>
+  </tbody></table>
+</div>
+
+
+  </div>
+
+  </div>
+</div>
+
+      </div>
+      <div class="gist-meta">
+        <a href="https://gist.github.com/victorsteven/a2089a777e36a8afb58ac18411025bf4/raw/ce026e17b4321ebbde27dbb36c40b0b18521d4af/server.go" style="float:right">view raw</a>
+        <a href="https://gist.github.com/victorsteven/a2089a777e36a8afb58ac18411025bf4#file-server-go">
+          server.go
+        </a>
+        hosted with ❤ by <a href="https://github.com/">GitHub</a>
+      </div>
+    </div>
+</div>
+<script>var height = -1; var delayMs = 200; if (document) {document.domain = document.domain;}function notifyResize(height) {height = height ? height : document.documentElement.offsetHeight; var resized = false; if (window.donkey && donkey.resize) {donkey.resize(height);var elements = document.getElementsByClassName("gist-data"); for (var i = 0; i < elements.length; i++) {elements[i].style.overflow = "visible"}resized = true;}if (parent && parent._resizeIframe) {var obj = {iframe: window.frameElement, height: height}; parent._resizeIframe(obj); resized = true;}if (window.location && window.location.hash === "#amp=1" && window.parent && window.parent.postMessage) {window.parent.postMessage({sentinel: "amp", type: "embed-size", height: height}, "*");}if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.resize) {window.webkit.messageHandlers.resize.postMessage(height); resized = true;}return resized;}function maybeResize() {try {if (document.documentElement.offsetHeight != height && notifyResize()) {height = document.documentElement.offsetHeight;}delayMs = Math.min(delayMs * 2, 1000000); setTimeout(maybeResize, delayMs);} catch(error) {console.log('maybeResize error: ', error)}}maybeResize();</script></body></html>

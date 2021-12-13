@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)https://levelup.gitconnected.com/media/66e95964514656184f57c9c65022a6b0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>middlewares.go – Medium</title><meta name="description" content="You can&#39;t perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to refresh your session."><meta name="twitter:widgets:csp" content="on"><meta name="robots" content="noindex"><!--<base target="_blank">--><base href="." target="_blank"><style>body {text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: "ff-tisa-web-pro", Georgia, Cambria, "Times New Roman", Times, serif; font-weight: 400; color: #333332; font-size: 18px; line-height: 1.4; margin: 0; background-color: white; overflow: hidden;}iframe {max-width: 100%;}</style></head><body><style>.gist .gist-file { margin-bottom: 0 !important; }.gist { text-rendering: auto; }</style><script src="./b612a471311841e74ca604b338e0f559.js.download" charset="utf-8"></script><link rel="stylesheet" href="./gist-embed-ff75a167df5efbfedb0e388793ca9fe7.css"><div id="gist97984320" class="gist">
+    <div class="gist-file" translate="no">
+      <div class="gist-data">
+        <div class="js-gist-file-update-container js-task-list-container file-box">
+  <div id="file-middlewares-go" class="file my-2">
+    
+  <div itemprop="text" class="Box-body p-0 blob-wrapper data type-go  ">
+
+      
+<div class="js-check-bidi blob-code-content">
+  <template class="js-file-alert-template"></template>
+<template class="js-line-alert-template"></template>
+
+  <table class="highlight tab-size js-file-line-container js-code-nav-container js-tagsearch-file" data-tab-size="8" data-paste-markdown-skip="" data-tagsearch-lang="Go" data-tagsearch-path="middlewares.go">
+        <tbody><tr>
+          <td id="file-middlewares-go-L1" class="blob-num js-line-number js-code-nav-line-number" data-line-number="1"></td>
+          <td id="file-middlewares-go-LC1" class="blob-code blob-code-inner js-file-line"><span class="pl-k">package</span> middlewares</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L2" class="blob-num js-line-number js-code-nav-line-number" data-line-number="2"></td>
+          <td id="file-middlewares-go-LC2" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L3" class="blob-num js-line-number js-code-nav-line-number" data-line-number="3"></td>
+          <td id="file-middlewares-go-LC3" class="blob-code blob-code-inner js-file-line"><span class="pl-k">import</span> (</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L4" class="blob-num js-line-number js-code-nav-line-number" data-line-number="4"></td>
+          <td id="file-middlewares-go-LC4" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"errors"</span></td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L5" class="blob-num js-line-number js-code-nav-line-number" data-line-number="5"></td>
+          <td id="file-middlewares-go-LC5" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"net/http"</span></td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L6" class="blob-num js-line-number js-code-nav-line-number" data-line-number="6"></td>
+          <td id="file-middlewares-go-LC6" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L7" class="blob-num js-line-number js-code-nav-line-number" data-line-number="7"></td>
+          <td id="file-middlewares-go-LC7" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"github.com/victorsteven/fullstack/api/auth"</span></td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L8" class="blob-num js-line-number js-code-nav-line-number" data-line-number="8"></td>
+          <td id="file-middlewares-go-LC8" class="blob-code blob-code-inner js-file-line">	<span class="pl-s">"github.com/victorsteven/fullstack/api/responses"</span></td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L9" class="blob-num js-line-number js-code-nav-line-number" data-line-number="9"></td>
+          <td id="file-middlewares-go-LC9" class="blob-code blob-code-inner js-file-line">)</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L10" class="blob-num js-line-number js-code-nav-line-number" data-line-number="10"></td>
+          <td id="file-middlewares-go-LC10" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L11" class="blob-num js-line-number js-code-nav-line-number" data-line-number="11"></td>
+          <td id="file-middlewares-go-LC11" class="blob-code blob-code-inner js-file-line"><span class="pl-k">func</span> <span class="pl-en">SetMiddlewareJSON</span>(<span class="pl-s1">next</span> http.<span class="pl-smi">HandlerFunc</span>) http.<span class="pl-smi">HandlerFunc</span> {</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L12" class="blob-num js-line-number js-code-nav-line-number" data-line-number="12"></td>
+          <td id="file-middlewares-go-LC12" class="blob-code blob-code-inner js-file-line">	<span class="pl-k">return</span> <span class="pl-k">func</span>(<span class="pl-s1">w</span> http.<span class="pl-smi">ResponseWriter</span>, <span class="pl-s1">r</span> <span class="pl-c1">*</span>http.<span class="pl-smi">Request</span>) {</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L13" class="blob-num js-line-number js-code-nav-line-number" data-line-number="13"></td>
+          <td id="file-middlewares-go-LC13" class="blob-code blob-code-inner js-file-line">		<span class="pl-s1">w</span>.<span class="pl-en">Header</span>().<span class="pl-en">Set</span>(<span class="pl-s">"Content-Type"</span>, <span class="pl-s">"application/json"</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L14" class="blob-num js-line-number js-code-nav-line-number" data-line-number="14"></td>
+          <td id="file-middlewares-go-LC14" class="blob-code blob-code-inner js-file-line">		<span class="pl-en">next</span>(<span class="pl-s1">w</span>, <span class="pl-s1">r</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L15" class="blob-num js-line-number js-code-nav-line-number" data-line-number="15"></td>
+          <td id="file-middlewares-go-LC15" class="blob-code blob-code-inner js-file-line">	}</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L16" class="blob-num js-line-number js-code-nav-line-number" data-line-number="16"></td>
+          <td id="file-middlewares-go-LC16" class="blob-code blob-code-inner js-file-line">}</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L17" class="blob-num js-line-number js-code-nav-line-number" data-line-number="17"></td>
+          <td id="file-middlewares-go-LC17" class="blob-code blob-code-inner js-file-line">
+</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L18" class="blob-num js-line-number js-code-nav-line-number" data-line-number="18"></td>
+          <td id="file-middlewares-go-LC18" class="blob-code blob-code-inner js-file-line"><span class="pl-k">func</span> <span class="pl-en">SetMiddlewareAuthentication</span>(<span class="pl-s1">next</span> http.<span class="pl-smi">HandlerFunc</span>) http.<span class="pl-smi">HandlerFunc</span> {</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L19" class="blob-num js-line-number js-code-nav-line-number" data-line-number="19"></td>
+          <td id="file-middlewares-go-LC19" class="blob-code blob-code-inner js-file-line">	<span class="pl-k">return</span> <span class="pl-k">func</span>(<span class="pl-s1">w</span> http.<span class="pl-smi">ResponseWriter</span>, <span class="pl-s1">r</span> <span class="pl-c1">*</span>http.<span class="pl-smi">Request</span>) {</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L20" class="blob-num js-line-number js-code-nav-line-number" data-line-number="20"></td>
+          <td id="file-middlewares-go-LC20" class="blob-code blob-code-inner js-file-line">		<span class="pl-s1">err</span> <span class="pl-c1">:=</span> <span class="pl-s1">auth</span>.<span class="pl-en">TokenValid</span>(<span class="pl-s1">r</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L21" class="blob-num js-line-number js-code-nav-line-number" data-line-number="21"></td>
+          <td id="file-middlewares-go-LC21" class="blob-code blob-code-inner js-file-line">		<span class="pl-k">if</span> <span class="pl-s1">err</span> <span class="pl-c1">!=</span> <span class="pl-c1">nil</span> {</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L22" class="blob-num js-line-number js-code-nav-line-number" data-line-number="22"></td>
+          <td id="file-middlewares-go-LC22" class="blob-code blob-code-inner js-file-line">			<span class="pl-s1">responses</span>.<span class="pl-en">ERROR</span>(<span class="pl-s1">w</span>, <span class="pl-s1">http</span>.<span class="pl-c1">StatusUnauthorized</span>, <span class="pl-s1">errors</span>.<span class="pl-en">New</span>(<span class="pl-s">"Unauthorized"</span>))</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L23" class="blob-num js-line-number js-code-nav-line-number" data-line-number="23"></td>
+          <td id="file-middlewares-go-LC23" class="blob-code blob-code-inner js-file-line">			<span class="pl-k">return</span></td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L24" class="blob-num js-line-number js-code-nav-line-number" data-line-number="24"></td>
+          <td id="file-middlewares-go-LC24" class="blob-code blob-code-inner js-file-line">		}</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L25" class="blob-num js-line-number js-code-nav-line-number" data-line-number="25"></td>
+          <td id="file-middlewares-go-LC25" class="blob-code blob-code-inner js-file-line">		<span class="pl-en">next</span>(<span class="pl-s1">w</span>, <span class="pl-s1">r</span>)</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L26" class="blob-num js-line-number js-code-nav-line-number" data-line-number="26"></td>
+          <td id="file-middlewares-go-LC26" class="blob-code blob-code-inner js-file-line">	}</td>
+        </tr>
+        <tr>
+          <td id="file-middlewares-go-L27" class="blob-num js-line-number js-code-nav-line-number" data-line-number="27"></td>
+          <td id="file-middlewares-go-LC27" class="blob-code blob-code-inner js-file-line">}</td>
+        </tr>
+  </tbody></table>
+</div>
+
+
+  </div>
+
+  </div>
+</div>
+
+      </div>
+      <div class="gist-meta">
+        <a href="https://gist.github.com/victorsteven/b612a471311841e74ca604b338e0f559/raw/9b1e2780d695053aed660555be3654e71c002dac/middlewares.go" style="float:right">view raw</a>
+        <a href="https://gist.github.com/victorsteven/b612a471311841e74ca604b338e0f559#file-middlewares-go">
+          middlewares.go
+        </a>
+        hosted with ❤ by <a href="https://github.com/">GitHub</a>
+      </div>
+    </div>
+</div>
+<script>var height = -1; var delayMs = 200; if (document) {document.domain = document.domain;}function notifyResize(height) {height = height ? height : document.documentElement.offsetHeight; var resized = false; if (window.donkey && donkey.resize) {donkey.resize(height);var elements = document.getElementsByClassName("gist-data"); for (var i = 0; i < elements.length; i++) {elements[i].style.overflow = "visible"}resized = true;}if (parent && parent._resizeIframe) {var obj = {iframe: window.frameElement, height: height}; parent._resizeIframe(obj); resized = true;}if (window.location && window.location.hash === "#amp=1" && window.parent && window.parent.postMessage) {window.parent.postMessage({sentinel: "amp", type: "embed-size", height: height}, "*");}if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.resize) {window.webkit.messageHandlers.resize.postMessage(height); resized = true;}return resized;}function maybeResize() {try {if (document.documentElement.offsetHeight != height && notifyResize()) {height = document.documentElement.offsetHeight;}delayMs = Math.min(delayMs * 2, 1000000); setTimeout(maybeResize, delayMs);} catch(error) {console.log('maybeResize error: ', error)}}maybeResize();</script></body></html>
